@@ -1,0 +1,19 @@
+creature
+  valkyrie
+
+item
+  equipment
+    weapon
+    armor
+    spec
+  furniture
+  turret
+
+building
+  economicStructure
+
+map
+
+terrain
+
+engine
