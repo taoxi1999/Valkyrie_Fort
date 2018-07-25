@@ -3,8 +3,7 @@ import math
 
 
 class creature(object):
-    objs = []
-
+    objs = [] #register all instances of this class created
 
     def __init__(obj, posX, posY, tag, hp, hpCup, objWeight, speed):
         obj.posX = posX
@@ -17,7 +16,6 @@ class creature(object):
         obj.speed = speed #number of rounds a creature need to move a pix, need to be larger than 1, integer
 
         creature.objs.append(obj)
-
 
 
     def report(obj):
@@ -172,7 +170,3 @@ class engine(object): #use class list to seprately call ALL instances of ALL cla
         elif direction == 9:
             obj.posX = obj.posX + 1
             obj.posY = obj.posY + 1
-
-
-
-    
