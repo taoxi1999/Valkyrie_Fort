@@ -5,7 +5,6 @@ import math
 class creature(object):
     objs = []
 
-
     def __init__(obj, posX, posY, tag, hp, hpCup, objWeight, speed):
         obj.posX = posX
         obj.posY = posY
@@ -16,6 +15,7 @@ class creature(object):
         obj.objWeight = objWeight
         obj.speed = speed #number of rounds a creature need to move a pix, need to be larger than 1, integer
 
+        #inheritants also appear in their mother lists
         creature.objs.append(obj)
 
 
@@ -33,7 +33,8 @@ class creature(object):
     def step_all(cls):
         for obj in cls.objs:
             #do something to each instance
-            obj.move(1)
+            #obj.move(1)
+            gameEngine.move(obj,1)
 
 
 
@@ -42,6 +43,7 @@ class creature(object):
 
 
 class valkyrie(creature):
+    objs = []
 
     def __init__(obj, posX, posY, tag, name, str, dex, con, intl, luk, hp, hpCup, mp, mpCup, attack, defense, dodgeChance, objWeight, movingWeight, speed):
         super(valkyrie, obj).__init__(posX, posY, tag, hp, hpCup, objWeight, speed)
@@ -67,6 +69,9 @@ class valkyrie(creature):
         obj.movingWeight = movingWeight #weight that is used when calculating movement range
         obj.speed = math.floor( 1 + (movingWeight * 2) / objWeight ) #how many turns does it need to make one move, need fix
 
+        #Append new valkyrie instances to valkyrie.objs[]
+        valkyrie.objs.append(obj)
+
     def report(obj):
         #print out all sorts of instance information
         e1 = "name = %r " %obj.name
@@ -75,6 +80,13 @@ class valkyrie(creature):
         e4 = "hp = %r " %obj.hp
 
         print e1 + e2 + e3 + e4
+
+    @classmethod
+    def step_all(cls):
+        for obj in cls.objs:
+            #do something to each instance
+            #obj.move(1)
+            gameEngine.move(obj,1)
 
 
 
@@ -187,9 +199,9 @@ gameEngine = engine()
 valkyrie1.report()
 valkyrie2.report()
 
-gameEngine.attack(valkyrie1,valkyrie2)
-gameEngine.move(valkyrie1,1)
-
+#gameEngine.attack(valkyrie1,valkyrie2)
+#gameEngine.move(valkyrie1,1)
+valkyrie.step_all()
 
 #creature1.report()
 #creature2.report()
