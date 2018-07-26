@@ -68,6 +68,15 @@ class valkyrie(creature):
         obj.movingWeight = movingWeight #weight that is used when calculating movement range
         obj.speed = math.floor( 1 + (movingWeight * 2) / objWeight ) #how many turns does it need to make one move, need fix
 
+        #initialized valkyries are naked!
+        obj.eqpLeftHandStat = False
+        obj.eqpRightHandStat = False
+        obj.eqpHeadStat = False
+        obj.eqpBreastStat = False
+        obj.eqpArmStat = False
+        obj.eqpLegStat = False
+        obj.eqpShoeStat = False
+
         #Append new valkyrie instances to valkyrie.objs[]
         valkyrie.objs.append(obj)
 
@@ -77,8 +86,10 @@ class valkyrie(creature):
         e2 = "posX = %r " %obj.posX
         e3 = "posY = %r " %obj.posY
         e4 = "hp = %r " %obj.hp
+        e5 = "attack = %r " %obj.attack
+        e6 = "defense = %r " %obj.defense
 
-        print e1 + e2 + e3 + e4
+        print e1 + e2 + e3 + e4 + e5 + e6
 
     @classmethod
     def step_all(cls):
@@ -99,23 +110,23 @@ class item(object):
 
 class equipment(item):
     def __init__(obj, posX, posY, name, endurance, rank, bodyPart):
-        super(item, obj).__init__(posX, posY, name, endurance, rank)
+        super(equipment, obj).__init__(posX, posY, name, endurance, rank)
         obj.bodyPart = bodyPart
 
 class weapon(equipment):
     def __init__(obj, posX, posY, name, endurance, rank, bodyPart, attack, defense, parryRate):
         super(equipment, obj).__init__(posX, posY, name, endurance, rank, bodyPart)
         obj.attack = attack
-        obj.defense = defense
+        obj.defense = defense #valid if it is a sword&shield weapon
         obj.parryRate = parryRate
 
 
 class armor(equipment):
-    def __init__(obj, posX, posY, name, endurance, rank, bodyPart, attack, defense, parryRate):
-        super(equipment, obj).__init__(posX, posY, name, endurance, rank, bodyPart)
+    def __init__(obj, posX, posY, name, endurance, rank, bodyPart, attack, defense, dodgeChance):
+        super(armor, obj).__init__(posX, posY, name, endurance, rank, bodyPart)
         obj.attack = attack
         obj.defense = defense
-        obj.parryRate = parryRate
+        obj.dodgeChance = dodgeChance
 
 class spec(equipment):
     #if needed
@@ -145,7 +156,7 @@ class terrain(object):
 class engine(object): #use class list to seprately call ALL instances of ALL classes to perform next-step
     def attack(obj, attacker, defender): #obj arg is always needed when packing a function in a method
         #interactions between objects, put here
-        if (attacker.posX == defender.posX and attacker.posY == defender.posY) == 1:
+        if (attacker.posX == defender.posX and attacker.posY == defender.posY) == True:
             if attacker.attack <= defender.defense:
                 defenderSub = 0
             else:
@@ -182,3 +193,41 @@ class engine(object): #use class list to seprately call ALL instances of ALL cla
         elif direction == 9:
             obj.posX = obj.posX + 1
             obj.posY = obj.posY + 1
+
+    def equip(obj, equipment, valkyrie):#only applicable to valkyries
+
+        def addstat():
+            valkyrie.eqpHeadStat = True
+            valkyrie.attack = valkyrie.attack + equipment.attack
+            valkyrie.defense = valkyrie.defense + equipment.defense
+            valkyrie.dodgeChance = valkyrie.dodgeChance + equipment.dodgeChance
+
+        if valkyrie.__class__.__name__ == 'valkyrie':
+            #equip armor
+            if equipment.__class__.__name__ == 'armor':
+                if (equipment.bodyPart == 'Head' and valkyrie.eqpHeadStat == False) == True:
+                    addstat()
+                elif (equipment.bodyPart == 'Breast' and valkyrie.eqpBreastStat == False) == True:
+                    addstat()
+                elif (equipment.bodyPart == 'Arm' and valkyrie.eqpArmStat == False) == True:
+                    addstat()
+                elif (equipment.bodyPart == 'Leg' and valkyrie.eqpLegStat == False) == True:
+                    addstat()
+                elif (equipment.bodyPart == 'Shoe' and valkyrie.eqpShoeStat == False) == True:
+                    addstat()
+
+
+
+
+
+
+gameEngine = engine()
+
+valkyrie1 = valkyrie(5,5,"valkyrie","valkyrie1",5,5,5,5,5,100,100,50,50,0,0,0,45,0,0)
+armor1 = armor(5,5,'Strall', 100, 5, 'Head', 0, 100, 5)
+
+valkyrie1.report()
+
+gameEngine.equip(armor1, valkyrie1)
+
+valkyrie1.report()

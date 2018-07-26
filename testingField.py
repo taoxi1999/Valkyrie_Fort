@@ -33,7 +33,6 @@ class creature(object):
     def step_all(cls):
         for obj in cls.objs:
             #do something to each instance
-            #obj.move(1)
             gameEngine.move(obj,1)
 
 
@@ -69,6 +68,15 @@ class valkyrie(creature):
         obj.movingWeight = movingWeight #weight that is used when calculating movement range
         obj.speed = math.floor( 1 + (movingWeight * 2) / objWeight ) #how many turns does it need to make one move, need fix
 
+        #initialized valkyries are naked!
+        obj.eqpLeftHandStat = False
+        obj.eqpRightHandStat = False
+        obj.eqpHeadStat = False
+        obj.eqpBreastStat = False
+        obj.eqpArmStat = False
+        obj.eqpLegStat = False
+        obj.eqpShoeStat = False
+
         #Append new valkyrie instances to valkyrie.objs[]
         valkyrie.objs.append(obj)
 
@@ -85,7 +93,6 @@ class valkyrie(creature):
     def step_all(cls):
         for obj in cls.objs:
             #do something to each instance
-            #obj.move(1)
             gameEngine.move(obj,1)
 
 
@@ -108,16 +115,16 @@ class weapon(equipment):
     def __init__(obj, posX, posY, name, endurance, rank, bodyPart, attack, defense, parryRate):
         super(equipment, obj).__init__(posX, posY, name, endurance, rank, bodyPart)
         obj.attack = attack
-        obj.defense = defense
+        obj.defense = defense #valid if it is a sword&shield weapon
         obj.parryRate = parryRate
 
 
 class armor(equipment):
-    def __init__(obj, posX, posY, name, endurance, rank, bodyPart, attack, defense, parryRate):
+    def __init__(obj, posX, posY, name, endurance, rank, bodyPart, attack, defense, dodgeChance):
         super(equipment, obj).__init__(posX, posY, name, endurance, rank, bodyPart)
         obj.attack = attack
         obj.defense = defense
-        obj.parryRate = parryRate
+        obj.dodgeChance = dodgeChance
 
 class spec(equipment):
     #if needed
@@ -147,7 +154,7 @@ class terrain(object):
 class engine(object): #use class list to seprately call ALL instances of ALL classes to perform next-step
     def attack(obj, attacker, defender): #obj arg is always needed when packing a function in a method
         #interactions between objects, put here
-        if (attacker.posX == defender.posX and attacker.posY == defender.posY) == 1:
+        if (attacker.posX == defender.posX and attacker.posY == defender.posY) == True:
             if attacker.attack <= defender.defense:
                 defenderSub = 0
             else:
@@ -185,6 +192,21 @@ class engine(object): #use class list to seprately call ALL instances of ALL cla
             obj.posX = obj.posX + 1
             obj.posY = obj.posY + 1
 
+    def equip(equipment, valkyrie):
+        if equipment.cls == armor:
+            if (equipment.cls == equipment & valkyrie.cls == valkyrie) == True:
+                if (equipment.bodyPart == 'Head' and valkyrie.eqpHeadStat == False) == True:
+                    valkyrie.eqpHeadStat = True
+                    valkyrie.attack = valkyrie.attack + equipment.attack
+                    valkyrie.defense = valkyrie.defense + equipment.defense
+                    valkyrie.dodgeChance = valkyrie.dodgeChance + equipment.dodgeChance
+                elif (equipment.bodyPart == 'Breast' and valkyrie.eqpBreastStat == False) == True:
+                    pass
+
+
+
+
+
 
 
 #tester initialization
@@ -199,9 +221,9 @@ gameEngine = engine()
 valkyrie1.report()
 valkyrie2.report()
 
-#gameEngine.attack(valkyrie1,valkyrie2)
+gameEngine.attack(valkyrie1,valkyrie2)
 #gameEngine.move(valkyrie1,1)
-valkyrie.step_all()
+#valkyrie.step_all()
 
 #creature1.report()
 #creature2.report()
