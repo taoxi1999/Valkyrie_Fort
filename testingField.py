@@ -5,12 +5,12 @@ import math
 class creature(object):
     objs = []
 
-    def __init__(obj, posX, posY, tag, hp, hpCup, objWeight, speed):
+    def __init__(obj, posX, posY, tag, hpCup, objWeight, speed):
         obj.posX = posX
         obj.posY = posY
         obj.tag = tag #indicate which type of creature it is
 
-        obj.hp = hp
+        obj.hp = hpCup
         obj.hpCup = hpCup
         obj.objWeight = objWeight
         obj.speed = speed #number of rounds a creature need to move a pix, need to be larger than 1, integer
@@ -39,13 +39,11 @@ class creature(object):
 
 
 
-
-
 class valkyrie(creature):
     objs = []
 
-    def __init__(obj, posX, posY, tag, name, str, dex, con, intl, luk, hp, hpCup, mp, mpCup, attack, defense, dodgeChance, objWeight, movingWeight, speed):
-        super(valkyrie, obj).__init__(posX, posY, tag, hp, hpCup, objWeight, speed)
+    def __init__(obj, posX, posY, tag, name, str, dex, con, intl, luk, hpCup, mpCup, objWeight, movingWeight, speed):
+        super(valkyrie, obj).__init__(posX, posY, tag, hpCup, objWeight, speed)
 
         obj.name = name
 
@@ -56,13 +54,14 @@ class valkyrie(creature):
         obj.luk = luk
 
         #equations need fixs
-        obj.hp = hp
+        obj.hp = hpCup
         obj.hpCup = str/5 + con
-        obj.mp = mp
+        obj.mp = mpCup
         obj.mpCup = intl * 2
         obj.attack = str + dex * 0.2
         obj.defense = con * 0.5
         obj.dodgeChance = dex #depricated for now
+        obj.parryRate = 0
 
         obj.objWeight = objWeight #can be changed with interactions with facilities
         obj.movingWeight = movingWeight #weight that is used when calculating movement range
@@ -77,6 +76,7 @@ class valkyrie(creature):
         obj.eqpLegStat = False
         obj.eqpShoeStat = False
 
+
         #Append new valkyrie instances to valkyrie.objs[]
         valkyrie.objs.append(obj)
 
@@ -86,8 +86,10 @@ class valkyrie(creature):
         e2 = "posX = %r " %obj.posX
         e3 = "posY = %r " %obj.posY
         e4 = "hp = %r " %obj.hp
+        e5 = "attack = %r " %obj.attack
+        e6 = "defense = %r " %obj.defense
 
-        print e1 + e2 + e3 + e4
+        print e1 + e2 + e3 + e4 + e5 + e6
 
     @classmethod
     def step_all(cls):
@@ -104,16 +106,18 @@ class item(object):
         obj.name = name
         obj.endurance = endurance
         obj.rank = rank
+        obj.owner = 'gaea'
 
 
 class equipment(item):
     def __init__(obj, posX, posY, name, endurance, rank, bodyPart):
-        super(item, obj).__init__(posX, posY, name, endurance, rank)
+        super(equipment, obj).__init__(posX, posY, name, endurance, rank)
         obj.bodyPart = bodyPart
+        obj.usr =  'gaea'
 
 class weapon(equipment):
     def __init__(obj, posX, posY, name, endurance, rank, bodyPart, attack, defense, parryRate):
-        super(equipment, obj).__init__(posX, posY, name, endurance, rank, bodyPart)
+        super(weapon, obj).__init__(posX, posY, name, endurance, rank, bodyPart)
         obj.attack = attack
         obj.defense = defense #valid if it is a sword&shield weapon
         obj.parryRate = parryRate
@@ -121,7 +125,7 @@ class weapon(equipment):
 
 class armor(equipment):
     def __init__(obj, posX, posY, name, endurance, rank, bodyPart, attack, defense, dodgeChance):
-        super(equipment, obj).__init__(posX, posY, name, endurance, rank, bodyPart)
+        super(armor, obj).__init__(posX, posY, name, endurance, rank, bodyPart)
         obj.attack = attack
         obj.defense = defense
         obj.dodgeChance = dodgeChance
@@ -131,16 +135,16 @@ class spec(equipment):
     pass
 
 
-class furniture(item):
-    pass
-
-class turret(item):
-    pass
-
 
 class building(object):
     pass
 class economicStructure(building):
+    pass
+class militaryStructure(building):
+    pass
+class torrent(militaryStructure):
+    pass
+class powerStructure(building):
     pass
 
 
@@ -192,16 +196,60 @@ class engine(object): #use class list to seprately call ALL instances of ALL cla
             obj.posX = obj.posX + 1
             obj.posY = obj.posY + 1
 
-    def equip(equipment, valkyrie):
-        if equipment.cls == armor:
-            if (equipment.cls == equipment & valkyrie.cls == valkyrie) == True:
-                if (equipment.bodyPart == 'Head' and valkyrie.eqpHeadStat == False) == True:
-                    valkyrie.eqpHeadStat = True
-                    valkyrie.attack = valkyrie.attack + equipment.attack
-                    valkyrie.defense = valkyrie.defense + equipment.defense
-                    valkyrie.dodgeChance = valkyrie.dodgeChance + equipment.dodgeChance
-                elif (equipment.bodyPart == 'Breast' and valkyrie.eqpBreastStat == False) == True:
-                    pass
+    def equip(obj, equipment, valkyrie):#only applicable to valkyries
+
+        def armorAddStat():
+            valkyrie.eqpHeadStat = True
+            valkyrie.attack = valkyrie.attack + equipment.attack
+            valkyrie.defense = valkyrie.defense + equipment.defense
+            valkyrie.dodgeChance = valkyrie.dodgeChance + equipment.dodgeChance
+            equipment.owner = valkyrie.name
+            equipment.usr = valkyrie.name
+
+        def LHWeaponAddStat():#Left Hand Weapon AddStat
+            valkyrie.eqpLeftHandStat = True
+            valkyrie.attack = valkyrie.attack + equipment.attack
+            valkyrie.defense = valkyrie.defense + equipment.defense
+            valkyrie.parryRate = valkyrie.parryRate + equipment.parryRate
+
+        def LHWeaponAddStat():#Right Hand Weapon AddStat
+            valkyrie.eqpRightHandStat = True
+            valkyrie.attack = valkyrie.attack + equipment.attack
+            valkyrie.defense = valkyrie.defense + equipment.defense
+            valkyrie.parryRate = valkyrie.parryRate + equipment.parryRate
+
+        def THWeaponAddStat():#TwoHanded Weapon AddStat
+            valkyrie.eqpLeftHandStat = True
+            valkyrie.eqpRightHandStat = True
+            valkyrie.attack = valkyrie.attack + equipment.attack
+            valkyrie.defense = valkyrie.defense + equipment.defense
+            valkyrie.parryRate = valkyrie.parryRate + equipment.parryRate
+
+
+            if valkyrie.__class__.__name__ == 'valkyrie':
+                #equip armor
+                if equipment.__class__.__name__ == 'armor':
+                    if (equipment.bodyPart == 'Head' and valkyrie.eqpHeadStat == False) == True:
+                        armorAddStat()
+                    elif (equipment.bodyPart == 'Breast' and valkyrie.eqpBreastStat == False) == True:
+                        armorAddStat()
+                    elif (equipment.bodyPart == 'Arm' and valkyrie.eqpArmStat == False) == True:
+                        armorAddStat()
+                    elif (equipment.bodyPart == 'Leg' and valkyrie.eqpLegStat == False) == True:
+                        armorAddStat()
+                    elif (equipment.bodyPart == 'Shoe' and valkyrie.eqpShoeStat == False) == True:
+                        armorAddStat()
+
+                if equipment.__class__.__name__ == 'weapon':
+                    if (equipment.bodyPart == 'LeftHand' and valkyrie.eqpLeftHandStat == False) == True:
+                        LHWeaponAddStat()
+                    elif (equipment.bodyPart == 'RightHand' and valkyrie.eqpRightHandStat == False) == True:
+                        RHWeaponAddStat()
+                    elif (equipment.bodyPart == 'TwoHanded' and valkyrie.eqpLeftHandStat == False and valkyrie.eqpRightHandStat == False) == True:
+                        THWeaponAddStat()
+
+
+
 
 
 
@@ -221,7 +269,7 @@ gameEngine = engine()
 valkyrie1.report()
 valkyrie2.report()
 
-gameEngine.attack(valkyrie1,valkyrie2)
+#gameEngine.attack(valkyrie1,valkyrie2)
 #gameEngine.move(valkyrie1,1)
 #valkyrie.step_all()
 
