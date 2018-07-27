@@ -1,6 +1,3 @@
-class tester(object):
-    def __init__(self, point):
-        self.point = point
-
-    def constructor(self, point):
-        newTester = tester(point)
+if 5 <= 10:
+    print "1"
+else: print "2"

@@ -23,10 +23,11 @@ Gasha.report()
 print "--->Initial Report Complete!"
 
 #gameEngine.equip(Strall, Hina)
-#gameEngine.equip(Excalibur, Hina)
+gameEngine.equip(Excalibur, Hina)
+gameEngine.equip(Excalibur, Gasha)
 gameEngine.useItem(potion1, Hina)
 gameEngine.attack(Hina, Gasha)
-gameEngine.attack(Gasha, Hina)
+
 
 #Final Report Stage
 print "--->Starting Final Report!"

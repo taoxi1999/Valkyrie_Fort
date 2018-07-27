@@ -237,13 +237,15 @@ class engine(object): #use class list to seprately call ALL instances of ALL cla
             RND1 = randint(0,100)
             if RND1 <= defender.parryRate:
                 #defender parry success!
-                attackFin = attacker.attack * ( 1 - (defender.parryEfficiency / 100) )
+                print "Defender parry success!"
+                attackFin = (attacker.attack * (100 - defender.parryEfficiency)) / 100 #Avoid 2/5=0 problem
             else: attackFin = attacker.attack
 
             RND2 = randint(0,100)
             if RND2 <= attacker.parryRate:
                 #attacker parry success!
-                defendFin = defender.attack * ( 1 - (attacker.parryEfficiency / 100) )
+                print "Attacker parry success!"
+                defendFin = (defender.attack * (100 - attacker.parryEfficiency)) / 100
             else: defendFin = defender.attack
 
 
@@ -257,8 +259,9 @@ class engine(object): #use class list to seprately call ALL instances of ALL cla
                 attackerSub = 0
             else:
                 attackerSub = defendFin - attacker.defense
-            defender.hp = defender.hp - defenderSub
-            attacker.hp = attacker.hp - attackerSub
+
+            defender.hp -= defenderSub
+            attacker.hp -= attackerSub
 
     def move(self, obj, direction):
 
