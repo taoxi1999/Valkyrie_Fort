@@ -28,6 +28,7 @@ gameEngine.equip(Excalibur, Gasha)
 gameEngine.useItem(potion1, Hina)
 gameEngine.attack(Hina, Gasha)
 
+classes.valkyrie.step_all()
 
 #Final Report Stage
 print "--->Starting Final Report!"

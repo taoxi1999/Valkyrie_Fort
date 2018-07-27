@@ -49,6 +49,7 @@ class valkyrie(object):
 
         obj.name = name
         obj.lvl = 1
+        obj.death = False
 
         obj.str = str
         obj.dex = dex
@@ -100,7 +101,13 @@ class valkyrie(object):
     def step_all(cls):
         for obj in cls.objs:
             #do something to each instance
-            gameEngine.move(obj,1)
+            tempEngine = engine()
+            Death = tempEngine.deathCheck(obj)
+            if Death == True:
+                obj.death = True
+                print "%r is dead!" %obj.name
+                obj.hp = -10 # reserve hp = -1 to cheat death skills
+            else: pass
 
 
 
@@ -355,3 +362,8 @@ class engine(object): #use class list to seprately call ALL instances of ALL cla
             valkyrie.mp += item.mpRecover
             if valkyrie.mp >= valkyrie.mpCup:
                 valkyrie.mp = valkyrie.mpCup
+
+    def deathCheck(obj, target):
+        if target.hp <= 0:
+            return True
+        else: return False
