@@ -11,21 +11,25 @@ execfile("weaponInit.py")
 execfile("armorInit.py")
 
 
-Hina = classes.valkyrie(5,5,"valkyrie","Hina",20,20,20,20,20,20,100,50,45,0,0)
-potion1 = classes.smallHpPotion(5, 5)
+Hina = classes.valkyrie(5,5,"valkyrie","Hina",20,20,20,20,20,20,45,0,0)
+Gasha = classes.valkyrie(5,5,"valkyrie","Gasha",20,20,20,20,20,20,45,0,0)
+potion1 = classes.LargeMpPotion(5, 5)
 print "Complete!"
 
 
 print "--->Starting Initial Report!"
 Hina.report()
+Gasha.report()
 print "--->Initial Report Complete!"
 
-gameEngine.equip(Strall, Hina)
-gameEngine.equip(Excalibur, Hina)
-gameEngine.equip(Excalibur, Hina)
+#gameEngine.equip(Strall, Hina)
+#gameEngine.equip(Excalibur, Hina)
 gameEngine.useItem(potion1, Hina)
+gameEngine.attack(Hina, Gasha)
+gameEngine.attack(Gasha, Hina)
 
 #Final Report Stage
 print "--->Starting Final Report!"
 Hina.report()
+Gasha.report()
 print "--->Final Report Complete!"

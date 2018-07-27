@@ -1,4 +1,5 @@
 from sys import argv
+from random import randint
 import math
 
 class creature(object):
@@ -38,11 +39,13 @@ class creature(object):
 
 
 
-class valkyrie(creature):
+class valkyrie(object):
     objs = []
 
-    def __init__(obj, posX, posY, tag, name, str, dex, con, mag, spr, luk, hpCup, mpCup, objWeight, movingWeight, speed):
-        super(valkyrie, obj).__init__(posX, posY, tag, hpCup, objWeight, speed)
+    def __init__(obj, posX, posY, tag, name, str, dex, con, mag, spr, luk, objWeight, movingWeight, speed):
+
+        obj.posX = posX
+        obj.posY = posY
 
         obj.name = name
         obj.lvl = 1
@@ -54,14 +57,15 @@ class valkyrie(creature):
         obj.luk = luk
 
         #equations need fixs
-        obj.hp = hpCup
-        obj.hpCup = str/5 + con
-        obj.mp = mpCup
-        obj.mpCup = mag * 2
+        obj.hpCup = str * 2 + con * 10
+        obj.hp = obj.hpCup
+        obj.mpCup = mag * 5 + spr * 5
+        obj.mp = obj.mpCup
         obj.attack = str + dex * 0.2
         obj.defense = con * 0.5
         obj.dodgeChance = dex #depricated for now
         obj.parryRate = 0
+        obj.parryEfficiency = 0
 
         obj.objWeight = objWeight #can be changed with interactions with facilities
         obj.movingWeight = movingWeight #weight that is used when calculating movement range
@@ -86,10 +90,11 @@ class valkyrie(creature):
         e2 = "posX = %r " %obj.posX
         e3 = "posY = %r " %obj.posY
         e4 = "hp = %r " %obj.hp
-        e5 = "attack = %r " %obj.attack
-        e6 = "defense = %r " %obj.defense
+        e5 = "mp = %r " %obj.mp
+        e6 = "attack = %r " %obj.attack
+        e7 = "defense = %r " %obj.defense
 
-        print e1 + e2 + e3 + e4 + e5 + e6
+        print e1 + e2 + e3 + e4 + e5 + e6 +e7
 
     @classmethod
     def step_all(cls):
@@ -120,33 +125,71 @@ class smallHpPotion(hpPotion):
         super(smallHpPotion, obj).__init__(posX, posY)
         obj.name = "Small HP Potion"
         obj.rank = 1
-        obj.hpRecover = 20
+        obj.hpRecover = 50
 
 class mediumHpPotion(hpPotion):
-    pass
+    def __init__(obj, posX, posY):
+        super(mediumHpPotion, obj).__init__(posX, posY)
+        obj.name = "Medium HP Potion"
+        obj.rank = 2
+        obj.hpRecover = 200
 
 class LargeHpPotion(hpPotion):
-    pass
+    def __init__(obj, posX, posY):
+        super(LargeHpPotion, obj).__init__(posX, posY)
+        obj.name = "Large HP Potion"
+        obj.rank = 3
+        obj.hpRecover = 1000
+
+class mpPotion(potion):
+    def __init__(obj, posX, posY):
+        super(mpPotion, obj).__init__(posX, posY)
+
+class smallMpPotion(mpPotion):
+    def __init__(obj, posX, posY):
+        super(smallMpPotion, obj).__init__(posX, posY)
+        obj.name = "Small HP Potion"
+        obj.rank = 1
+        obj.mpRecover = 10
+
+class mediumMpPotion(mpPotion):
+    def __init__(obj, posX, posY):
+        super(mediumMpPotion, obj).__init__(posX, posY)
+        obj.name = "Medium HP Potion"
+        obj.rank = 2
+        obj.mpRecover = 50
+
+class LargeMpPotion(mpPotion):
+    def __init__(obj, posX, posY):
+        super(LargeMpPotion, obj).__init__(posX, posY)
+        obj.name = "Large HP Potion"
+        obj.rank = 3
+        obj.mpRecover = 100
+
 
 class equipment(item):
-    def __init__(obj, posX, posY, name, rank, bodyPart):
+    def __init__(obj, posX, posY, name, rank):
         super(equipment, obj).__init__(posX, posY)
         obj.name = name
         obj.rank = rank
-        obj.bodyPart = bodyPart
         obj.usr =  'gaea'
 
 class weapon(equipment):
-    def __init__(obj, posX, posY, name, rank, bodyPart, attack, defense, parryRate):
-        super(weapon, obj).__init__(posX, posY, name, rank, bodyPart)
+    def __init__(obj, posX, posY, name, rank, bodyPart, attack, defense, parryRate, parryEfficiency):
+        super(weapon, obj).__init__(posX, posY, name, rank)
+        obj.bodyPart = bodyPart
         obj.attack = attack
         obj.defense = defense #valid if it is a sword&shield weapon
-        obj.parryRate = parryRate
+        obj.parryRate = parryRate #in percentage
+        obj.parryEfficiency = parryEfficiency #80 stands for 80%
+
+
 
 
 class armor(equipment):
     def __init__(obj, posX, posY, name, rank, bodyPart, attack, defense, dodgeChance):
-        super(armor, obj).__init__(posX, posY, name, rank, bodyPart)
+        super(armor, obj).__init__(posX, posY, name, rank)
+        obj.bodyPart = bodyPart
         obj.attack = attack
         obj.defense = defense
         obj.dodgeChance = dodgeChance
@@ -190,14 +233,30 @@ class engine(object): #use class list to seprately call ALL instances of ALL cla
     def attack(obj, attacker, defender): #obj arg is always needed when packing a function in a method
         #interactions between objects, put here
         if (attacker.posX == defender.posX and attacker.posY == defender.posY) == True:
-            if attacker.attack <= defender.defense:
+
+            RND1 = randint(0,100)
+            if RND1 <= defender.parryRate:
+                #defender parry success!
+                attackFin = attacker.attack * ( 1 - (defender.parryEfficiency / 100) )
+            else: attackFin = attacker.attack
+
+            RND2 = randint(0,100)
+            if RND2 <= attacker.parryRate:
+                #attacker parry success!
+                defendFin = defender.attack * ( 1 - (attacker.parryEfficiency / 100) )
+            else: defendFin = defender.attack
+
+
+            if attackFin <= defender.defense:
                 defenderSub = 0
             else:
-                defenderSub = attacker.attack - defender.defense
-            if defender.attack <= attacker.defense:
+                defenderSub = attackFin - defender.defense
+
+
+            if defendFin <= attacker.defense:
                 attackerSub = 0
             else:
-                attackerSub = defender.attack - attacker.defense
+                attackerSub = defendFin - attacker.defense
             defender.hp = defender.hp - defenderSub
             attacker.hp = attacker.hp - attackerSub
 
@@ -240,23 +299,25 @@ class engine(object): #use class list to seprately call ALL instances of ALL cla
 
         def LHWeaponAddStat():#Left Hand Weapon AddStat
             valkyrie.eqpLeftHandStat = True
-            valkyrie.attack = valkyrie.attack + equipment.attack
-            valkyrie.defense = valkyrie.defense + equipment.defense
-            valkyrie.parryRate = valkyrie.parryRate + equipment.parryRate
+            valkyrie.attack += equipment.attack
+            valkyrie.defense += equipment.defense
+            valkyrie.parryRate += equipment.parryRate
+            valkyrie.parryEfficiency += equipment.parryEfficiency
 
-        def LHWeaponAddStat():#Right Hand Weapon AddStat
+        def RHWeaponAddStat():#Right Hand Weapon AddStat
             valkyrie.eqpRightHandStat = True
-            valkyrie.attack = valkyrie.attack + equipment.attack
-            valkyrie.defense = valkyrie.defense + equipment.defense
-            valkyrie.parryRate = valkyrie.parryRate + equipment.parryRate
+            valkyrie.attack += equipment.attack
+            valkyrie.defense += equipment.defense
+            valkyrie.parryRate += equipment.parryRate
+            valkyrie.parryEfficiency += equipment.parryEfficiency
 
         def THWeaponAddStat():#TwoHanded Weapon AddStat
             valkyrie.eqpLeftHandStat = True
             valkyrie.eqpRightHandStat = True
-            valkyrie.attack = valkyrie.attack + equipment.attack
-            valkyrie.defense = valkyrie.defense + equipment.defense
-            valkyrie.parryRate = valkyrie.parryRate + equipment.parryRate
-
+            valkyrie.attack += equipment.attack
+            valkyrie.defense += equipment.defense
+            valkyrie.parryRate += equipment.parryRate
+            valkyrie.parryEfficiency += equipment.parryEfficiency
 
         if valkyrie.__class__.__name__ == 'valkyrie':
             #equip armor
@@ -287,3 +348,7 @@ class engine(object): #use class list to seprately call ALL instances of ALL cla
             valkyrie.hp += item.hpRecover
             if valkyrie.hp >= valkyrie.hpCup:
                 valkyrie.hp = valkyrie.hpCup
+        if item.__class__.__bases__[0].__name__ == "mpPotion":
+            valkyrie.mp += item.mpRecover
+            if valkyrie.mp >= valkyrie.mpCup:
+                valkyrie.mp = valkyrie.mpCup
