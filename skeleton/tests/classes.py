@@ -2,119 +2,6 @@ from sys import argv
 from random import randint
 import math
 
-class creature(object):
-    objs = []
-
-    def __init__(obj, posX, posY, tag, hpCup, objWeight, speed):
-        obj.posX = posX
-        obj.posY = posY
-        obj.tag = tag #indicate which type of creature it is
-
-        obj.hp = hpCup
-        obj.hpCup = hpCup
-        obj.objWeight = objWeight
-        obj.speed = speed #number of rounds a creature need to move a pix, need to be larger than 1, integer
-
-        #inheritants also appear in their mother lists
-        creature.objs.append(obj)
-
-
-
-    def report(obj):
-        #print out all sorts of instance information
-
-        e1 = "tag = %r " %obj.tag
-        e2 = "posX = %r " %obj.posX
-        e3 = "posY = %r " %obj.posY
-        print e1 + e2 + e3
-
-
-    @classmethod
-    def step_all(cls):
-        for obj in cls.objs:
-            #do something to each instance
-            tempEngine = engine()
-            Death = tempEngine.deathCheck(obj)
-            if Death == True:
-                obj.death = True
-                print "%r is dead!" %obj.name
-                obj.hp = -10 # reserve hp = -1 to cheat death skills
-            else: pass
-
-class valkyrie(object):
-    objs = []
-
-    def __init__(obj, posX, posY, tag, name, str, dex, con, mag, spr, luk, objWeight, movingWeight, speed):
-
-        obj.posX = posX
-        obj.posY = posY
-
-        obj.name = name
-        obj.lvl = 1
-        obj.death = False
-
-        obj.str = str
-        obj.dex = dex
-        obj.con = con
-        obj.mag = mag
-        obj.luk = luk
-
-        #equations need fixs
-        obj.hpCup = str * 2 + con * 10
-        obj.hp = obj.hpCup
-        obj.mpCup = mag * 5 + spr * 5
-        obj.mp = obj.mpCup
-        obj.attack = str + dex * 0.2
-        obj.defense = con * 0.5
-        obj.dodgeChance = dex #depricated for now
-        obj.parryRate = 0
-        obj.parryEfficiency = 0
-
-        obj.objWeight = objWeight #can be changed with interactions with facilities
-        obj.movingWeight = movingWeight #weight that is used when calculating movement range
-        obj.speed = math.floor( 1 + (movingWeight * 2) / objWeight ) #how many turns does it need to make one move, need fix
-
-        #initialized valkyries are naked!
-        obj.eqpLeftHandStat = False
-        obj.eqpRightHandStat = False
-        obj.eqpHeadStat = False
-        obj.eqpBreastStat = False
-        obj.eqpArmStat = False
-        obj.eqpLegStat = False
-        obj.eqpShoeStat = False
-
-
-        #Append new valkyrie instances to valkyrie.objs[]
-        valkyrie.objs.append(obj)
-
-    def report(obj):
-        #print out all sorts of instance information
-        e1 = "name = %r " %obj.name
-        e2 = "posX = %r " %obj.posX
-        e3 = "posY = %r " %obj.posY
-        e4 = "hp = %r " %obj.hp
-        e5 = "mp = %r " %obj.mp
-        e6 = "attack = %r " %obj.attack
-        e7 = "defense = %r " %obj.defense
-
-        print e1 + e2 + e3 + e4 + e5 + e6 +e7
-
-    @classmethod
-    def step_all(cls):
-        for obj in cls.objs:
-            #do something to each instance
-            tempEngine = engine()
-            Death = tempEngine.deathCheck(obj)
-            if Death == True:
-                obj.death = True
-                print "%r is dead!" %obj.name
-                obj.hp = -10 # reserve hp = -1 to cheat death skills
-            else: pass
-
-            #refresh status
-            obj.hpCup = str * 2 + con * 10
-            obj.mpCup = mag * 5 + spr * 5 #depricated
-
 ##################################
 
 class item(object):
@@ -204,9 +91,10 @@ class armor(equipment):
         obj.defense = defense
         obj.dodgeChance = dodgeChance
 
-class Accessories(equipment):
+class accessory(equipment):
     def __init__(obj, posX, posY, name, rank, bodyPart, str, dex, con, mag, spr, luk):
-        super(armor, obj).__init__(posX, posY, name, rank, bodyPart)
+        super(accessory, obj).__init__(posX, posY, name, rank)
+        obj.bodyPart = 'AccessorySlot'
         obj.str = str
         obj.dex = dex
         obj.con = con
@@ -229,13 +117,15 @@ class powerStructure(building):
 
 ##################################
 
-class map(object):
-    pass
 
-class terrain(object):
-    pass
 
 class engine(object): #use class list to seprately call ALL instances of ALL classes to perform next-step
+    def __init__(self):
+        self.BlankWeapon = weapon(0,0,'NullWeapon',0,'NullHanded',0,0,0,0)
+        self.BlankArmor = armor(0,0,'NullArmor',0,'NullPart',0,0,0)
+        self.BlankAccessory = accessory(0,0,'NullAccessory',0,"NullAccSlot",0,0,0,0,0,0)
+        self.THHolder = weapon(0,0,'THholder',0,'THholder',0,0,0,0) # TwoHanded Holder : Used to block TwoHanded weapon's null hand
+
     def attack(obj, attacker, defender): #obj arg is always needed when packing a function in a method
         if (attacker.posX == defender.posX and attacker.posY == defender.posY) == True:
 
@@ -296,68 +186,38 @@ class engine(object): #use class list to seprately call ALL instances of ALL cla
             obj.posY = obj.posY + 1
 
     def equip(obj, equipment, valkyrie):#only applicable to valkyries
-
-        def armorAddStat():
-            valkyrie.eqpHeadStat = True
-            valkyrie.attack = valkyrie.attack + equipment.attack
-            valkyrie.defense = valkyrie.defense + equipment.defense
-            valkyrie.dodgeChance = valkyrie.dodgeChance + equipment.dodgeChance
-            equipment.owner = valkyrie.name
-            equipment.usr = valkyrie.name
-
-        def LHWeaponAddStat():#Left Hand Weapon AddStat
-            valkyrie.eqpLeftHandStat = True
-            valkyrie.attack += equipment.attack
-            valkyrie.defense += equipment.defense
-            valkyrie.parryRate += equipment.parryRate
-            valkyrie.parryEfficiency += equipment.parryEfficiency
-
-        def RHWeaponAddStat():#Right Hand Weapon AddStat
-            valkyrie.eqpRightHandStat = True
-            valkyrie.attack += equipment.attack
-            valkyrie.defense += equipment.defense
-            valkyrie.parryRate += equipment.parryRate
-            valkyrie.parryEfficiency += equipment.parryEfficiency
-
-        def THWeaponAddStat():#TwoHanded Weapon AddStat
-            valkyrie.eqpLeftHandStat = True
-            valkyrie.eqpRightHandStat = True
-            valkyrie.attack += equipment.attack
-            valkyrie.defense += equipment.defense
-            valkyrie.parryRate += equipment.parryRate
-            valkyrie.parryEfficiency += equipment.parryEfficiency
-
         if valkyrie.__class__.__name__ == 'valkyrie':
-            #equip armor
-            if equipment.__class__.__name__ == 'armor':
-                if (equipment.bodyPart == 'Head' and valkyrie.eqpHeadStat == False) == True:
-                    armorAddStat()
-                elif (equipment.bodyPart == 'Breast' and valkyrie.eqpBreastStat == False) == True:
-                    armorAddStat()
-                elif (equipment.bodyPart == 'Arm' and valkyrie.eqpArmStat == False) == True:
-                    armorAddStat()
-                elif (equipment.bodyPart == 'Leg' and valkyrie.eqpLegStat == False) == True:
-                    armorAddStat()
-                elif (equipment.bodyPart == 'Shoe' and valkyrie.eqpShoeStat == False) == True:
-                    armorAddStat()
-                else: print "Fail to equip Armor: %r " %equipment.name
 
             if equipment.__class__.__name__ == 'weapon':
-                if (equipment.bodyPart == 'LeftHand' and valkyrie.eqpLeftHandStat == False) == True:
-                    LHWeaponAddStat()
-                elif (equipment.bodyPart == 'RightHand' and valkyrie.eqpRightHandStat == False) == True:
-                    RHWeaponAddStat()
-                elif (equipment.bodyPart == 'TwoHanded' and valkyrie.eqpLeftHandStat == False and valkyrie.eqpRightHandStat == False) == True:
-                    THWeaponAddStat()
+                if (equipment.bodyPart == 'LeftHand' and valkyrie.equipmentSlot[0].name == 'NullWeapon') == True:
+                    valkyrie.equipmentSlot[0] = equipment
+                elif (equipment.bodyPart == 'RightHand' and valkyrie.equipmentSlot[1].name == 'NullWeapon') == True:
+                    valkyrie.equipmentSlot[1] = equipment
+                elif (equipment.bodyPart == 'TwoHanded' and valkyrie.equipmentSlot[0].name == 'NullWeapon' and valkyrie.equipmentSlot[1].name == 'NullWeapon') == True:
+                    valkyrie.equipmentSlot[0] = equipment
+                    tempEngine = engine()
+                    valkyrie.equipmentSlot[1] = tempEngine.THHolder
                 else: print "Fail to equip Weapon: %r " %equipment.name
 
-            if equipment.__class__.__name__ == 'Accessories':
-                valkyrie.str += equipment.str
-                valkyrie.dex += equipment.dex
-                valkyrie.con += equipment.con
-                valkyrie.mag += equipment.mag
-                valkyrie.spr += equipment.spr
-                valkyrie.luk += equipment.luk
+            if equipment.__class__.__name__ == 'armor':
+                if (equipment.bodyPart == 'Head' and valkyrie.equipmentSlot[2].name == 'NullArmor') == True:
+                    valkyrie.equipmentSlot[2] = equipment
+                elif (equipment.bodyPart == 'Breast' and valkyrie.equipmentSlot[3].name == 'NullArmor') == True:
+                    valkyrie.equipmentSlot[3] = equipment
+                elif (equipment.bodyPart == 'Arm' and valkyrie.equipmentSlot[4].name == 'NullArmor') == True:
+                    valkyrie.equipmentSlot[4] = equipment
+                elif (equipment.bodyPart == 'Leg' and valkyrie.equipmentSlot[5].name == 'NullArmor') == True:
+                    valkyrie.equipmentSlot[5] = equipment
+                elif (equipment.bodyPart == 'Shoe' and valkyrie.equipmentSlot[6].name == 'NullArmor') == True:
+                    valkyrie.equipmentSlot[6] = equipment
+                else: print "Fail to equip Armor: %r " %equipment.name
+
+            if equipment.__class__.__name__ == 'Accessory':
+                if (equipment.bodyPart == 'AccessorySlot' and valkyrie.equipmentSlot[7].name == 'NullAccessory') == True:
+                    valkyrie.equipmentSlot[7] = equipment
+                elif (equipment.bodyPart == 'AccessorySlot' and valkyrie.equipmentSlot[8].name == 'NullAccessory') == True:
+                    valkyrie.equipmentSlot[8] = equipment
+                else: print "Fail to equip Accessory: %r " %equipment.name
 
     def useItem(obj, item, valkyrie):
         if item.__class__.__bases__[0].__name__ == "hpPotion":
@@ -373,3 +233,168 @@ class engine(object): #use class list to seprately call ALL instances of ALL cla
         if target.hp <= 0:
             return True
         else: return False
+
+class map(object):
+    pass
+
+class terrain(object):
+    pass
+
+##################################
+
+class creature(object):
+    objs = []
+
+    def __init__(obj, posX, posY, tag, hpCup, objWeight, speed):
+        obj.posX = posX
+        obj.posY = posY
+        obj.tag = tag #indicate which type of creature it is
+
+        obj.hp = hpCup
+        obj.hpCup = hpCup
+        obj.objWeight = objWeight
+        obj.speed = speed #number of rounds a creature need to move a pix, need to be larger than 1, integer
+
+        #inheritants also appear in their mother lists
+        creature.objs.append(obj)
+
+
+
+    def report(obj):
+        #print out all sorts of instance information
+
+        e1 = "tag = %r " %obj.tag
+        e2 = "posX = %r " %obj.posX
+        e3 = "posY = %r " %obj.posY
+        print e1 + e2 + e3
+
+
+    @classmethod
+    def step_all(cls):
+        for obj in cls.objs:
+            #do something to each instance
+            tempEngine = engine()
+            Death = tempEngine.deathCheck(obj)
+            if Death == True:
+                obj.death = True
+                print "%r is dead!" %obj.name
+                obj.hp = -10 # reserve hp = -1 to cheat death skills
+            else: pass
+
+class valkyrie(object):
+    objs = []
+
+    def __init__(obj, posX, posY, tag, name):
+
+        tempEngine = engine()
+
+        obj.equipmentSlot = [0]*9 # LeftHand, RightHand, Head, Breast, Arm, Leg, Shoe, Acc1, Acc2
+        obj.inventory = [0]*50 #depricated
+        obj.equipmentSlot[0] = tempEngine.BlankWeapon
+        obj.equipmentSlot[1] = tempEngine.BlankWeapon
+        obj.equipmentSlot[2] = tempEngine.BlankArmor
+        obj.equipmentSlot[3] = tempEngine.BlankArmor
+        obj.equipmentSlot[4] = tempEngine.BlankArmor
+        obj.equipmentSlot[5] = tempEngine.BlankArmor
+        obj.equipmentSlot[6] = tempEngine.BlankArmor
+        obj.equipmentSlot[7] = tempEngine.BlankAccessory
+        obj.equipmentSlot[8] = tempEngine.BlankAccessory
+
+        obj.posX = posX
+        obj.posY = posY
+
+        obj.name = name
+        obj.lvl = 1
+        obj.Exp = 0
+        obj.lvlUpExp = 500 * obj.lvl
+        obj.death = False
+
+        #base points which is only related to lvl
+        obj.strBase = obj.lvl * 2
+        obj.dexBase = obj.lvl * 2
+        obj.conBase = obj.lvl * 2
+        obj.magBase = obj.lvl * 2
+        obj.sprBase = obj.lvl * 2
+        obj.lukBase = obj.lvl * 2
+
+        #Player added points
+        obj.strAdd = 0
+        obj.dexAdd = 0
+        obj.conAdd = 0
+        obj.magAdd = 0
+        obj.sprAdd = 0
+        obj.lukAdd = 0
+        obj.allPoints = obj.lvl * 5
+        obj.spentPoints  = obj.strAdd + obj.dexAdd + obj.conAdd + obj.magAdd + obj.sprAdd + obj.lukAdd
+        obj.freePoints = obj.allPoints - obj.spentPoints
+
+        #Calculated final points
+        obj.str = obj.strBase + obj.strAdd + obj.equipmentSlot[7].str + obj.equipmentSlot[8].str
+        obj.dex = obj.dexBase + obj.dexAdd + obj.equipmentSlot[7].str + obj.equipmentSlot[8].dex
+        obj.con = obj.conBase + obj.conAdd + obj.equipmentSlot[7].str + obj.equipmentSlot[8].con
+        obj.mag = obj.magBase + obj.magAdd + obj.equipmentSlot[7].str + obj.equipmentSlot[8].mag
+        obj.spr = obj.sprBase + obj.sprAdd + obj.equipmentSlot[7].str + obj.equipmentSlot[8].spr
+        obj.luk = obj.lukBase + obj.lukAdd + obj.equipmentSlot[7].str + obj.equipmentSlot[8].luk
+
+        #equations need fixs
+        obj.hpCup = obj.str * 2 + obj.con * 10
+        obj.hp = obj.hpCup
+        obj.mpCup = obj.mag * 5 + obj.spr * 5
+        obj.mp = obj.mpCup
+        obj.attack = obj.str + obj.dex * 0.2
+        obj.defense = obj.con * 0.5
+        obj.dodgeChance = obj.dex #depricated for now, encourage dex/con tradeoff
+        obj.parryRate = 0 #should have str and con fixture besides weapon attributes
+        obj.parryEfficiency = 0 #should have str and con fixture besides weapon attributes
+
+        obj.selfWeight = obj.con #can be changed with interactions with facilities
+        obj.carryWeight = obj.con #should be the weight of inventory
+        obj.speed = math.floor( 1 + (obj.selfWeight * 2) / obj.carryWeight ) #how many turns does it need to make one move, need fix
+
+
+
+        #Append new valkyrie instances to valkyrie.objs[]
+        valkyrie.objs.append(obj)
+
+    def report(obj):
+        #print out all sorts of instance information
+        e1 = "name = %r " %obj.name
+        e2 = "posX = %r " %obj.posX
+        e3 = "posY = %r " %obj.posY
+        e4 = "hp = %r " %obj.hp
+        e5 = "mp = %r " %obj.mp
+        e6 = "attack = %r " %obj.attack
+        e7 = "defense = %r " %obj.defense
+
+        print e1 + e2 + e3 + e4 + e5 + e6 +e7
+        #print obj.equipmentSlot
+
+    @classmethod
+    def step_all(cls):
+        for obj in cls.objs:
+            #do something to each instance
+            tempEngine = engine()
+            Death = tempEngine.deathCheck(obj)
+            if Death == True:
+                obj.death = True
+                print "%r is dead!" %obj.name
+                obj.hp = -10 # reserve hp = -1 to cheat death skills
+            else: pass
+
+            #refresh status
+            #status related to lvl and points added
+            obj.str = obj.strBase + obj.strAdd + obj.equipmentSlot[7].str + obj.equipmentSlot[8].str
+            obj.dex = obj.dexBase + obj.dexAdd + obj.equipmentSlot[7].str + obj.equipmentSlot[8].dex
+            obj.con = obj.conBase + obj.conAdd + obj.equipmentSlot[7].str + obj.equipmentSlot[8].con
+            obj.mag = obj.magBase + obj.magAdd + obj.equipmentSlot[7].str + obj.equipmentSlot[8].mag
+            obj.spr = obj.sprBase + obj.sprAdd + obj.equipmentSlot[7].str + obj.equipmentSlot[8].spr
+            obj.luk = obj.lukBase + obj.lukAdd + obj.equipmentSlot[7].str + obj.equipmentSlot[8].luk
+
+            #equations need fixs
+            obj.hpCup = obj.str * 2 + obj.con * 10
+            obj.mpCup = obj.mag * 5 + obj.spr * 5
+            obj.attack = (obj.str + obj.dex * 0.2) + obj.equipmentSlot[0].attack + obj.equipmentSlot[1].attack
+            obj.defense = (obj.con * 0.5) + + obj.equipmentSlot[0].defense + obj.equipmentSlot[1].defense
+            obj.dodgeChance = obj.dex #depricated for now, encourage dex/con tradeoff
+            obj.parryRate = 0 #should have str and con fixture besides weapon attributes
+            obj.parryEfficiency = 0 #should have str and con fixture besides weapon attributes

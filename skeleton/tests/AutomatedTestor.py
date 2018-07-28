@@ -9,10 +9,11 @@ gameEngine = classes.engine()
 print "Initializing testing environment."
 execfile("weaponInit.py")
 execfile("armorInit.py")
+execfile("AccessoryInit.py")
 
 
-Hina = classes.valkyrie(5,5,"valkyrie","Hina",20,20,20,20,20,20,45,0,0)
-Gasha = classes.valkyrie(5,5,"valkyrie","Gasha",20,20,20,20,20,20,45,0,0)
+Hina = classes.valkyrie(5,5,"valkyrie","Hina")
+Gasha = classes.valkyrie(5,5,"valkyrie","Gasha")
 potion1 = classes.LargeMpPotion(5, 5)
 print "Complete!"
 
