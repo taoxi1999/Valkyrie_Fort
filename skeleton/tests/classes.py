@@ -33,11 +33,13 @@ class creature(object):
     def step_all(cls):
         for obj in cls.objs:
             #do something to each instance
-            gameEngine.move(obj,1)
-
-
-
-
+            tempEngine = engine()
+            Death = tempEngine.deathCheck(obj)
+            if Death == True:
+                obj.death = True
+                print "%r is dead!" %obj.name
+                obj.hp = -10 # reserve hp = -1 to cheat death skills
+            else: pass
 
 class valkyrie(object):
     objs = []
@@ -109,7 +111,11 @@ class valkyrie(object):
                 obj.hp = -10 # reserve hp = -1 to cheat death skills
             else: pass
 
+            #refresh status
+            obj.hpCup = str * 2 + con * 10
+            obj.mpCup = mag * 5 + spr * 5 #depricated
 
+##################################
 
 class item(object):
     def __init__(obj, posX, posY):
@@ -117,7 +123,6 @@ class item(object):
         obj.posY = posY
         obj.endurance = 100
         obj.owner = 'gaea'
-
 
 class potion(item):
     def __init__(obj, posX, posY):
@@ -173,6 +178,7 @@ class LargeMpPotion(mpPotion):
         obj.rank = 3
         obj.mpRecover = 100
 
+##################################
 
 class equipment(item):
     def __init__(obj, posX, posY, name, rank):
@@ -189,9 +195,6 @@ class weapon(equipment):
         obj.defense = defense #valid if it is a sword&shield weapon
         obj.parryRate = parryRate #in percentage
         obj.parryEfficiency = parryEfficiency #80 stands for 80%
-
-
-
 
 class armor(equipment):
     def __init__(obj, posX, posY, name, rank, bodyPart, attack, defense, dodgeChance):
@@ -211,11 +214,7 @@ class Accessories(equipment):
         obj.spr = spr
         obj.luk = luk
 
-class spec(equipment):
-    #if needed
-    pass
-
-
+##################################
 
 class building(object):
     pass
@@ -228,7 +227,7 @@ class torrent(militaryStructure):
 class powerStructure(building):
     pass
 
-
+##################################
 
 class map(object):
     pass
@@ -238,7 +237,6 @@ class terrain(object):
 
 class engine(object): #use class list to seprately call ALL instances of ALL classes to perform next-step
     def attack(obj, attacker, defender): #obj arg is always needed when packing a function in a method
-        #interactions between objects, put here
         if (attacker.posX == defender.posX and attacker.posY == defender.posY) == True:
 
             RND1 = randint(0,100)
@@ -352,6 +350,14 @@ class engine(object): #use class list to seprately call ALL instances of ALL cla
                 elif (equipment.bodyPart == 'TwoHanded' and valkyrie.eqpLeftHandStat == False and valkyrie.eqpRightHandStat == False) == True:
                     THWeaponAddStat()
                 else: print "Fail to equip Weapon: %r " %equipment.name
+
+            if equipment.__class__.__name__ == 'Accessories':
+                valkyrie.str += equipment.str
+                valkyrie.dex += equipment.dex
+                valkyrie.con += equipment.con
+                valkyrie.mag += equipment.mag
+                valkyrie.spr += equipment.spr
+                valkyrie.luk += equipment.luk
 
     def useItem(obj, item, valkyrie):
         if item.__class__.__bases__[0].__name__ == "hpPotion":
