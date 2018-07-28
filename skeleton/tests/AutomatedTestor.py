@@ -1,5 +1,6 @@
 import classes
 import weaponInit
+import os
 
 
 
@@ -36,3 +37,5 @@ print "--->Starting Final Report!"
 Hina.report()
 Gasha.report()
 print "--->Final Report Complete!"
+
+os.system('rm *.pyc')
