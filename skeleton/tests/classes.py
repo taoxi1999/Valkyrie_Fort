@@ -363,10 +363,9 @@ class valkyrie(object):
         print e1 + e2 + e3 + e4 + e5 + e6 + e7 + e8
         #print obj.equipmentSlot
 
-    def inventoryCheck(obj):
+    def inventoryCheck(obj): # refresh obj.invList
         obj.invList = [[0,0]] # eg. [["Apple",2],["Stick",5]...]
 
-        print obj.inventory
         for x in obj.inventory:
             count = 0
             for y in obj.invList:
@@ -381,19 +380,18 @@ class valkyrie(object):
                     if x.__class__.__name__ == z[0]:
                         z[1] = count
 
-        print obj.invList
-
-
-
     def obtain(obj, item):
         obj.inventory.append(item)
+        obj.inventoryCheck()
 
-    def drop(obj, item, valkyrie):
-        pass #drop a specific number of something
-        if item in obj.inventory == True:
-            obj.inventory.remove(item)
-        else: print "Nothing to drop."
-
+    def drop(obj, itemName):
+        pass #drop an item (specific item)
+        for x in obj.inventory:
+            if x.__class__.__name__ == itemName:
+                obj.inventory.remove(x)
+                break
+            else: print "Nothing to drop."
+        obj.inventoryCheck()
 
 
     @classmethod

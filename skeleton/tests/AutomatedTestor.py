@@ -36,7 +36,9 @@ Hina.obtain(potion2)
 #gameEngine.useItem(potion1, Hina)
 #gameEngine.attack(Hina, Gasha)
 
-Hina.inventoryCheck()
+print Hina.invList
+Hina.drop("smallHpPotion")
+print Hina.invList
 
 #Final Report Stage
 print "--->Starting Final Report!"
