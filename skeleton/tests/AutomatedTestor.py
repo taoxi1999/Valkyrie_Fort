@@ -15,7 +15,8 @@ execfile("AccessoryInit.py")
 
 Hina = classes.valkyrie(5,5,"valkyrie","Hina")
 Gasha = classes.valkyrie(5,5,"valkyrie","Gasha")
-potion1 = classes.LargeMpPotion(5, 5)
+potion1 = classes.largeMpPotion(5, 5)
+potion2 = classes.smallHpPotion(5, 5)
 print "Complete!"
 
 
@@ -25,12 +26,17 @@ Gasha.report()
 print "--->Initial Report Complete!"
 
 #gameEngine.equip(Strall, Hina)
-gameEngine.equip(Excalibur, Hina)
-gameEngine.equip(Excalibur, Gasha)
-gameEngine.useItem(potion1, Hina)
-gameEngine.attack(Hina, Gasha)
+#gameEngine.equip(Excalibur, Hina)
+#gameEngine.equip(Excalibur, Gasha)
+Hina.obtain(potion1)
+Hina.obtain(potion1)
+Hina.obtain(potion2)
+Hina.obtain(potion2)
 
-classes.valkyrie.step_all()
+#gameEngine.useItem(potion1, Hina)
+#gameEngine.attack(Hina, Gasha)
+
+Hina.inventoryCheck()
 
 #Final Report Stage
 print "--->Starting Final Report!"

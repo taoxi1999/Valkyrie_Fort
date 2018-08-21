@@ -33,9 +33,9 @@ class mediumHpPotion(hpPotion):
         obj.rank = 2
         obj.hpRecover = 200
 
-class LargeHpPotion(hpPotion):
+class largeHpPotion(hpPotion):
     def __init__(obj, posX, posY):
-        super(LargeHpPotion, obj).__init__(posX, posY)
+        super(largeHpPotion, obj).__init__(posX, posY)
         obj.name = "Large HP Potion"
         obj.rank = 3
         obj.hpRecover = 1000
@@ -58,9 +58,9 @@ class mediumMpPotion(mpPotion):
         obj.rank = 2
         obj.mpRecover = 50
 
-class LargeMpPotion(mpPotion):
+class largeMpPotion(mpPotion):
     def __init__(obj, posX, posY):
-        super(LargeMpPotion, obj).__init__(posX, posY)
+        super(largeMpPotion, obj).__init__(posX, posY)
         obj.name = "Large HP Potion"
         obj.rank = 3
         obj.mpRecover = 100
@@ -164,26 +164,15 @@ class engine(object): #use class list to seprately call ALL instances of ALL cla
         #need to add speed algorithm based on game engine
         if direction == 5:
             return "idle"
-        elif direction == 1:
-            obj.posX = obj.posX - 1
-            obj.posY = obj.posY - 1
         elif direction == 2:
-            obj.posY = obj.posY - 1
-        elif direction == 3:
-            obj.posX = obj.posX + 1
             obj.posY = obj.posY - 1
         elif direction == 4:
             obj.posX = obj.posX - 1
         elif direction == 6:
             obj.posX = obj.posX + 1
-        elif direction == 7:
-            obj.posX = obj.posX - 1
-            obj.posY = obj.posY + 1
         elif direction == 8:
             obj.posY = obj.posY + 1
-        elif direction == 9:
-            obj.posX = obj.posX + 1
-            obj.posY = obj.posY + 1
+
 
     def equip(obj, equipment, valkyrie):#only applicable to valkyries
         if valkyrie.__class__.__name__ == 'valkyrie':
@@ -219,6 +208,8 @@ class engine(object): #use class list to seprately call ALL instances of ALL cla
                     valkyrie.equipmentSlot[8] = equipment
                 else: print "Fail to equip Accessory: %r " %equipment.name
 
+            valkyrie.step_all()
+
     def useItem(obj, item, valkyrie):
         if item.__class__.__bases__[0].__name__ == "hpPotion":
             valkyrie.hp += item.hpRecover
@@ -228,6 +219,8 @@ class engine(object): #use class list to seprately call ALL instances of ALL cla
             valkyrie.mp += item.mpRecover
             if valkyrie.mp >= valkyrie.mpCup:
                 valkyrie.mp = valkyrie.mpCup
+
+
 
     def deathCheck(obj, target):
         if target.hp <= 0:
@@ -289,7 +282,7 @@ class valkyrie(object):
         tempEngine = engine()
 
         obj.equipmentSlot = [0]*9 # LeftHand, RightHand, Head, Breast, Arm, Leg, Shoe, Acc1, Acc2
-        obj.inventory = [0]*50 #depricated
+        obj.inventory = []
         obj.equipmentSlot[0] = tempEngine.BlankWeapon
         obj.equipmentSlot[1] = tempEngine.BlankWeapon
         obj.equipmentSlot[2] = tempEngine.BlankArmor
@@ -365,9 +358,43 @@ class valkyrie(object):
         e5 = "mp = %r " %obj.mp
         e6 = "attack = %r " %obj.attack
         e7 = "defense = %r " %obj.defense
+        e8 = "parryRate = %r " %obj.parryRate
 
-        print e1 + e2 + e3 + e4 + e5 + e6 +e7
+        print e1 + e2 + e3 + e4 + e5 + e6 + e7 + e8
         #print obj.equipmentSlot
+
+    def inventoryCheck(obj):
+        obj.invList = [[0,0]] # eg. [["Apple",2],["Stick",5]...]
+
+        print obj.inventory
+        for x in obj.inventory:
+            count = 0
+            for y in obj.invList:
+                if x.__class__.__name__ == y[0]:
+                    count = y[1] + 1
+                else: count = 0
+            if count == 0:
+                tuple = [x.__class__.__name__,1]
+                obj.invList.append(tuple)
+            elif count >= 1:
+                for z in obj.invList:
+                    if x.__class__.__name__ == z[0]:
+                        z[1] = count
+
+        print obj.invList
+
+
+
+    def obtain(obj, item):
+        obj.inventory.append(item)
+
+    def drop(obj, item, valkyrie):
+        pass #drop a specific number of something
+        if item in obj.inventory == True:
+            obj.inventory.remove(item)
+        else: print "Nothing to drop."
+
+
 
     @classmethod
     def step_all(cls):
@@ -396,5 +423,5 @@ class valkyrie(object):
             obj.attack = (obj.str + obj.dex * 0.2) + obj.equipmentSlot[0].attack + obj.equipmentSlot[1].attack
             obj.defense = (obj.con * 0.5) + + obj.equipmentSlot[0].defense + obj.equipmentSlot[1].defense
             obj.dodgeChance = obj.dex #depricated for now, encourage dex/con tradeoff
-            obj.parryRate = 0 #should have str and con fixture besides weapon attributes
+            obj.parryRate = 0 + obj.equipmentSlot[0].parryRate + obj.equipmentSlot[1].parryRate #should have str and con fixture besides weapon attributes
             obj.parryEfficiency = 0 #should have str and con fixture besides weapon attributes
