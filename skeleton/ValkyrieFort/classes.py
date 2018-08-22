@@ -131,11 +131,21 @@ class engine(object): #use class list to seprately call ALL instances of ALL cla
             return True
         else: return False
 
+    def spawnTerrain():
+        pass
+
+    def refreshTerrain():
+        pass
+
+
 class map(object):
     pass
 
 class terrain(object):
+
     pass
+
+
 
 ##################################
 

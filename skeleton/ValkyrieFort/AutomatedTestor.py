@@ -13,7 +13,7 @@ execfile("armorInit.py")
 execfile("accessoryInit.py")
 
 
-Hina = classes.valkyrie(5,5,"valkyrie","Hina")
+Hina = classes.valkyrie(5,5-,"valkyrie","Hina")
 Gasha = classes.valkyrie(5,5,"valkyrie","Gasha")
 potion1 = classes.largeHpPotion(5, 5)
 potion2 = classes.smallMpPotion(5, 5)
