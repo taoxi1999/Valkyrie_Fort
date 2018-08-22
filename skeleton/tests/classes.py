@@ -126,102 +126,6 @@ class engine(object): #use class list to seprately call ALL instances of ALL cla
         self.BlankAccessory = accessory(0,0,'NullAccessory',0,"NullAccSlot",0,0,0,0,0,0)
         self.THHolder = weapon(0,0,'THholder',0,'THholder',0,0,0,0) # TwoHanded Holder : Used to block TwoHanded weapon's null hand
 
-    def attack(obj, attacker, defender): #obj arg is always needed when packing a function in a method
-        if (attacker.posX == defender.posX and attacker.posY == defender.posY) == True:
-
-            RND1 = randint(0,100)
-            if RND1 <= defender.parryRate:
-                #defender parry success!
-                print "Defender parry success!"
-                attackFin = (attacker.attack * (100 - defender.parryEfficiency)) / 100 #Avoid 2/5=0 problem
-            else: attackFin = attacker.attack
-
-            RND2 = randint(0,100)
-            if RND2 <= attacker.parryRate:
-                #attacker parry success!
-                print "Attacker parry success!"
-                defendFin = (defender.attack * (100 - attacker.parryEfficiency)) / 100
-            else: defendFin = defender.attack
-
-
-            if attackFin <= defender.defense:
-                defenderSub = 0
-            else:
-                defenderSub = attackFin - defender.defense
-
-
-            if defendFin <= attacker.defense:
-                attackerSub = 0
-            else:
-                attackerSub = defendFin - attacker.defense
-
-            defender.hp -= defenderSub
-            attacker.hp -= attackerSub
-
-    def move(self, obj, direction):
-
-        #need to add error detection
-        #need to add speed algorithm based on game engine
-        if direction == 5:
-            return "idle"
-        elif direction == 2:
-            obj.posY = obj.posY - 1
-        elif direction == 4:
-            obj.posX = obj.posX - 1
-        elif direction == 6:
-            obj.posX = obj.posX + 1
-        elif direction == 8:
-            obj.posY = obj.posY + 1
-
-
-    def equip(obj, equipment, valkyrie):#only applicable to valkyries
-        if valkyrie.__class__.__name__ == 'valkyrie':
-
-            if equipment.__class__.__name__ == 'weapon':
-                if (equipment.bodyPart == 'LeftHand' and valkyrie.equipmentSlot[0].name == 'NullWeapon') == True:
-                    valkyrie.equipmentSlot[0] = equipment
-                elif (equipment.bodyPart == 'RightHand' and valkyrie.equipmentSlot[1].name == 'NullWeapon') == True:
-                    valkyrie.equipmentSlot[1] = equipment
-                elif (equipment.bodyPart == 'TwoHanded' and valkyrie.equipmentSlot[0].name == 'NullWeapon' and valkyrie.equipmentSlot[1].name == 'NullWeapon') == True:
-                    valkyrie.equipmentSlot[0] = equipment
-                    tempEngine = engine()
-                    valkyrie.equipmentSlot[1] = tempEngine.THHolder
-                else: print "Fail to equip Weapon: %r " %equipment.name
-
-            if equipment.__class__.__name__ == 'armor':
-                if (equipment.bodyPart == 'Head' and valkyrie.equipmentSlot[2].name == 'NullArmor') == True:
-                    valkyrie.equipmentSlot[2] = equipment
-                elif (equipment.bodyPart == 'Breast' and valkyrie.equipmentSlot[3].name == 'NullArmor') == True:
-                    valkyrie.equipmentSlot[3] = equipment
-                elif (equipment.bodyPart == 'Arm' and valkyrie.equipmentSlot[4].name == 'NullArmor') == True:
-                    valkyrie.equipmentSlot[4] = equipment
-                elif (equipment.bodyPart == 'Leg' and valkyrie.equipmentSlot[5].name == 'NullArmor') == True:
-                    valkyrie.equipmentSlot[5] = equipment
-                elif (equipment.bodyPart == 'Shoe' and valkyrie.equipmentSlot[6].name == 'NullArmor') == True:
-                    valkyrie.equipmentSlot[6] = equipment
-                else: print "Fail to equip Armor: %r " %equipment.name
-
-            if equipment.__class__.__name__ == 'Accessory':
-                if (equipment.bodyPart == 'AccessorySlot' and valkyrie.equipmentSlot[7].name == 'NullAccessory') == True:
-                    valkyrie.equipmentSlot[7] = equipment
-                elif (equipment.bodyPart == 'AccessorySlot' and valkyrie.equipmentSlot[8].name == 'NullAccessory') == True:
-                    valkyrie.equipmentSlot[8] = equipment
-                else: print "Fail to equip Accessory: %r " %equipment.name
-
-            valkyrie.step_all()
-
-    def useItem(obj, item, valkyrie):
-        if item.__class__.__bases__[0].__name__ == "hpPotion":
-            valkyrie.hp += item.hpRecover
-            if valkyrie.hp >= valkyrie.hpCup:
-                valkyrie.hp = valkyrie.hpCup
-        if item.__class__.__bases__[0].__name__ == "mpPotion":
-            valkyrie.mp += item.mpRecover
-            if valkyrie.mp >= valkyrie.mpCup:
-                valkyrie.mp = valkyrie.mpCup
-
-
-
     def deathCheck(obj, target):
         if target.hp <= 0:
             return True
@@ -392,6 +296,116 @@ class valkyrie(object):
                 break
             else: print "Nothing to drop."
         obj.inventoryCheck()
+
+    def attack_Act(obj, target): #obj arg is always needed when packing a function in a method
+        if (obj.posX == target.posX and obj.posY == target.posY) == True:
+
+            RND1 = randint(0,100)
+            if RND1 <= target.parryRate:
+                #defender parry success!
+                print "Defender parry success!"
+                attackFin = (obj.attack * (100 - target.parryEfficiency)) / 100 #Avoid 2/5=0 problem
+            else: attackFin = obj.attack
+
+            RND2 = randint(0,100)
+            if RND2 <= obj.parryRate:
+                #attacker parry success!
+                print "Attacker parry success!"
+                defendFin = (target.attack * (100 - obj.parryEfficiency)) / 100
+            else: defendFin = target.attack
+
+
+            if attackFin <= target.defense:
+                defenderSub = 0
+            else:
+                defenderSub = attackFin - target.defense
+
+
+            if defendFin <= obj.defense:
+                attackerSub = 0
+            else:
+                attackerSub = defendFin - obj.defense
+
+            target.hp -= defenderSub
+            obj.hp -= attackerSub
+
+    def move(obj, direction):
+
+        #need to add error detection
+        #need to add speed algorithm based on game engine
+        if direction == 5:
+            return "idle"
+        elif direction == 2:
+            obj.posY = obj.posY - 1
+        elif direction == 4:
+            obj.posX = obj.posX - 1
+        elif direction == 6:
+            obj.posX = obj.posX + 1
+        elif direction == 8:
+            obj.posY = obj.posY + 1
+
+    def equip(obj, equipment):
+        if equipment.__class__.__name__ == 'weapon':
+            if (equipment.bodyPart == 'LeftHand' and obj.equipmentSlot[0].name == 'NullWeapon') == True:
+                obj.equipmentSlot[0] = equipment
+            elif (equipment.bodyPart == 'RightHand' and obj.equipmentSlot[1].name == 'NullWeapon') == True:
+                obj.equipmentSlot[1] = equipment
+            elif (equipment.bodyPart == 'TwoHanded' and obj.equipmentSlot[0].name == 'NullWeapon' and obj.equipmentSlot[1].name == 'NullWeapon') == True:
+                obj.equipmentSlot[0] = equipment
+                tempEngine = engine()
+                obj.equipmentSlot[1] = tempEngine.THHolder
+            else: print "Fail to equip Weapon: %r " %equipment.name
+
+        if equipment.__class__.__name__ == 'armor':
+            if (equipment.bodyPart == 'Head' and obj.equipmentSlot[2].name == 'NullArmor') == True:
+                obj.equipmentSlot[2] = equipment
+            elif (equipment.bodyPart == 'Breast' and obj.equipmentSlot[3].name == 'NullArmor') == True:
+                obj.equipmentSlot[3] = equipment
+            elif (equipment.bodyPart == 'Arm' and obj.equipmentSlot[4].name == 'NullArmor') == True:
+                obj.equipmentSlot[4] = equipment
+            elif (equipment.bodyPart == 'Leg' and obj.equipmentSlot[5].name == 'NullArmor') == True:
+                obj.equipmentSlot[5] = equipment
+            elif (equipment.bodyPart == 'Shoe' and obj.equipmentSlot[6].name == 'NullArmor') == True:
+                obj.equipmentSlot[6] = equipment
+            else: print "Fail to equip Armor: %r " %equipment.name
+
+        if equipment.__class__.__name__ == 'Accessory':
+            if (equipment.bodyPart == 'AccessorySlot' and obj.equipmentSlot[7].name == 'NullAccessory') == True:
+                obj.equipmentSlot[7] = equipment
+            elif (equipment.bodyPart == 'AccessorySlot' and obj.equipmentSlot[8].name == 'NullAccessory') == True:
+                obj.equipmentSlot[8] = equipment
+            else: print "Fail to equip Accessory: %r " %equipment.name
+
+        valkyrie.refreshStatus()
+
+    def useItem(obj, item):
+        if item.__class__.__bases__[0].__name__ == "hpPotion":
+            obj.hp += item.hpRecover
+            if obj.hp >= obj.hpCup:
+                obj.hp = obj.hpCup
+        if item.__class__.__bases__[0].__name__ == "mpPotion":
+            obj.mp += item.mpRecover
+            if obj.mp >= obj.mpCup:
+                obj.mp = obj.mpCup
+
+    def refreshStatus(obj):
+        #refresh status
+        #status related to lvl and points added
+        obj.str = obj.strBase + obj.strAdd + obj.equipmentSlot[7].str + obj.equipmentSlot[8].str
+        obj.dex = obj.dexBase + obj.dexAdd + obj.equipmentSlot[7].str + obj.equipmentSlot[8].dex
+        obj.con = obj.conBase + obj.conAdd + obj.equipmentSlot[7].str + obj.equipmentSlot[8].con
+        obj.mag = obj.magBase + obj.magAdd + obj.equipmentSlot[7].str + obj.equipmentSlot[8].mag
+        obj.spr = obj.sprBase + obj.sprAdd + obj.equipmentSlot[7].str + obj.equipmentSlot[8].spr
+        obj.luk = obj.lukBase + obj.lukAdd + obj.equipmentSlot[7].str + obj.equipmentSlot[8].luk
+
+        #equations need fixs
+        obj.hpCup = obj.str * 2 + obj.con * 10
+        obj.mpCup = obj.mag * 5 + obj.spr * 5
+        obj.attack = (obj.str + obj.dex * 0.2) + obj.equipmentSlot[0].attack + obj.equipmentSlot[1].attack
+        obj.defense = (obj.con * 0.5) + + obj.equipmentSlot[0].defense + obj.equipmentSlot[1].defense
+        obj.dodgeChance = obj.dex #depricated for now, encourage dex/con tradeoff
+        obj.parryRate = 0 + obj.equipmentSlot[0].parryRate + obj.equipmentSlot[1].parryRate #should have str and con fixture besides weapon attributes
+        obj.parryEfficiency = 0 #should have str and con fixture besides weapon attributes
 
 
     @classmethod
