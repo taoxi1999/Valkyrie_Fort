@@ -142,7 +142,6 @@ class map(object):
     pass
 
 class terrain(object):
-
     pass
 
 
@@ -416,6 +415,8 @@ class valkyrie(object):
         obj.dodgeChance = obj.dex #depricated for now, encourage dex/con tradeoff
         obj.parryRate = 0 + obj.equipmentSlot[0].parryRate + obj.equipmentSlot[1].parryRate #should have str and con fixture besides weapon attributes
         obj.parryEfficiency = 0 #should have str and con fixture besides weapon attributes
+
+
 
 
     @classmethod
