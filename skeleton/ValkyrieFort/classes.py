@@ -172,7 +172,7 @@ class creature(object):
         e1 = "tag = %r " %obj.tag
         e2 = "posX = %r " %obj.posX
         e3 = "posY = %r " %obj.posY
-        print e1 + e2 + e3
+        print(e1 + e2 + e3)
 
 
     @classmethod
@@ -183,7 +183,7 @@ class creature(object):
             Death = tempEngine.deathCheck(obj)
             if Death == True:
                 obj.death = True
-                print "%r is dead!" %obj.name
+                print("%r is dead!" %obj.name)
                 obj.hp = -10 # reserve hp = -1 to cheat death skills
             else: pass
 
@@ -273,7 +273,7 @@ class valkyrie(object):
         e7 = "defense = %r " %obj.defense
         e8 = "parryRate = %r " %obj.parryRate
 
-        print e1 + e2 + e3 + e4 + e5 + e6 + e7 + e8
+        print(e1 + e2 + e3 + e4 + e5 + e6 + e7 + e8)
         #print obj.equipmentSlot
 
     def inventoryCheck(obj): # refresh obj.invList
@@ -312,14 +312,14 @@ class valkyrie(object):
             RND1 = randint(0,100)
             if RND1 <= target.parryRate:
                 #defender parry success!
-                print "Defender parry success!"
+                print("Defender parry success!")
                 attackFin = (obj.attack * (100 - target.parryEfficiency)) / 100 #Avoid 2/5=0 problem
             else: attackFin = obj.attack
 
             RND2 = randint(0,100)
             if RND2 <= obj.parryRate:
                 #attacker parry success!
-                print "Attacker parry success!"
+                print("Attacker parry success!")
                 defendFin = (target.attack * (100 - obj.parryEfficiency)) / 100
             else: defendFin = target.attack
 
@@ -363,7 +363,7 @@ class valkyrie(object):
                 obj.equipmentSlot[0] = equipment
                 tempEngine = engine()
                 obj.equipmentSlot[1] = tempEngine.THHolder
-            else: print "Fail to equip Weapon: %r " %equipment.name
+            else: print("Fail to equip Weapon: %r " %equipment.name)
 
         if equipment.__class__.__name__ == 'armor':
             if (equipment.bodyPart == 'Head' and obj.equipmentSlot[2].name == 'NullArmor') == True:
@@ -376,14 +376,14 @@ class valkyrie(object):
                 obj.equipmentSlot[5] = equipment
             elif (equipment.bodyPart == 'Shoe' and obj.equipmentSlot[6].name == 'NullArmor') == True:
                 obj.equipmentSlot[6] = equipment
-            else: print "Fail to equip Armor: %r " %equipment.name
+            else: print("Fail to equip Armor: %r " %equipment.name)
 
         if equipment.__class__.__name__ == 'Accessory':
             if (equipment.bodyPart == 'AccessorySlot' and obj.equipmentSlot[7].name == 'NullAccessory') == True:
                 obj.equipmentSlot[7] = equipment
             elif (equipment.bodyPart == 'AccessorySlot' and obj.equipmentSlot[8].name == 'NullAccessory') == True:
                 obj.equipmentSlot[8] = equipment
-            else: print "Fail to equip Accessory: %r " %equipment.name
+            else: print ("Fail to equip Accessory: %r " %equipment.name)
 
         valkyrie.refreshStatus()
 
@@ -427,7 +427,7 @@ class valkyrie(object):
             Death = tempEngine.deathCheck(obj)
             if Death == True:
                 obj.death = True
-                print "%r is dead!" %obj.name
+                print ("%r is dead!" %obj.name)
                 obj.hp = -10 # reserve hp = -1 to cheat death skills
             else: pass
 
